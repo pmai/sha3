@@ -89,8 +89,26 @@ have to be converted to a simple-array with element-type
 rely on implementation-specific functions and is not part of the SHA3
 library.
 
-The implementation is licensed under the MIT-style license contained
-in the file COPYING and the header of each source file.
+The file keccak-reference.lisp contains a slow simple reference
+implementation, and testdriver code, which allows testing of the tuned
+implementations against this reference and against test data available
+from the Keccak Site at: http://keccak.noekeon.org/KeccakKAT-3.zip
+
+The testcases from the Keccak test data can be run with the following
+form:
+
+(keccak:test-keccak-msgkat 
+ "/Path/To/MsgKatDirectory"
+ (lambda (total-bits bit-rate output-bits message)
+   (declare (ignore total-bits bit-rate))
+   (sha3:sha3-digest-vector message :output-bit-length output-bits)))
+
+This SHA-3 implementation is licensed under the MIT-style license
+contained in the file COPYING and the header of each source file.
+Many thanks go to the Keccak Team (Guido Bertoni, Joan Daemen, Michaël
+Peeters and Gilles Van Assche, cf. http://keccak.noekeon.org) for
+their algorithm and excellent documentation and reference
+implementations.
 
 Please direct any feedback to pmai@pmsf.de.  A git repository of this
 library is available under git://github.com/pmai/sha3.git
