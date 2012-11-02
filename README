@@ -1,0 +1,96 @@
+This library is an implementation of the Secure Hash Algorithm 3
+(SHA-3), also known as Keccak.  The implementation is constrained to
+messages with an integral number of octets, i.e. sub-byte length
+messages are not supported.
+
+The implementation should be portable across nearly all ANSI compliant
+CL with specialized implementations tuned for implementations that
+offer unboxed 64bit arithmetic, unboxed 32bit arithmetic and for
+implementations with efficient fixnum arithmetic (requiring fixnums
+that can represent (unsigned-byte 16)).  Especially the 64 and 32bit
+implementations have been mostly optimized for SBCL and CMU CL.  For
+those implementations, digests with a 1024 bit-rate (and 288 bit
+digest output) can be generated in between 30 (64bit SBCL) to around
+100 (32bit CMU CL) cycles/byte on an i7-640M; whereas optimized
+C/assembler implementations reach around 12 to 50 cycles/byte on 64/32
+bit Intel hardware.  The reason for the discrepancy probably lies in
+missing peephole and dependency optimizations in the SBCL/CMU CL
+compiler backend.
+
+The mid-level interfaces to the digest routines are the functions
+
+- sha3:sha3-init &key output-bit-length bit-rate
+  
+  Create and return a new SHA-3 state.  If `output-bit-length' is
+  specified then the state will run at the bit rate specified for the
+  given output bit length.  If `output-bit-length' is unspecified,
+  `bit-rate' can be specified to select a suitable bit rate.  If both
+  are left unspecified then a default bit rate of 1024 bits is
+  selected, which is suitable for arbitrary output bit lengths of up
+  to 288 bits.
+
+- sha3:sha3-copy state
+  
+  Return an independent copy of the SHA-3 state `state'.
+
+- sha3:sha3-state-p state
+  
+  Test whether a given object is a SHA-3 state, i.e. is an instance of
+  the class sha3:sha3-state.
+
+- sha3:sha3-update state vector &key (start 0) (end (length vector))
+  
+  Update the given SHA-3 state `state' from `vector', which must be a
+  simple-array with element-type (unsigned-byte 8), bounded by `start'
+  and `end', which must be numeric bounding-indices.
+
+- sha3:sha3-final state &key output-bit-length
+  
+  If the given SHA-3 state `state' has not already been finalized,
+  finalize it by processing any remaining input in its buffer, with
+  suitable padding as specified by the SHA-3 standard.  Returns the
+  message digest as a simple-array of (unsigned-byte 8).  The length
+  of the returned digest is determined either by the output bit length
+  or bit rate specified on state creation, or for the special case of
+  default parameters being used, by the optional keyword argument
+  `output-bit-length'.  If the state has previously been finalized,
+  the function will return the digest again.
+
+For convenience the following high-level functions produce digests in
+one step from 1d simple-arrays and streams with element-type
+(unsigned-byte 8), as well as files:
+
+- sha3:sha3-digest-vector vector &key (start 0) end (output-bit-length 512)
+  
+  Calculate an SHA-3 message-digest of data in `vector', which should
+  be a 1d simple-array with element type (unsigned-byte 8), bounded by
+  `start' and `end'.  The bit length of the message digest produced is
+  controlled by `output-bit-length', which can take on the values 224,
+  256, 288, 384 and 512, which is the default value.
+
+- sha3:sha3-digest-stream stream &key (output-bit-length 512)
+  
+  Calculate an SHA-3 message-digest of data read from `stream', which
+  should be a stream with element type (unsigned-byte 8).  The bit
+  length of the message digest produced is controlled by
+  `output-bit-length', which can take on the values 224, 256, 288, 384
+  and 512, which is the default value.
+
+- sha3:sha3-digest-file pathname &key (output-bit-length 512)
+  
+  Calculate an SHA-3 message-digest of the file specified by
+  `pathname'.  The bit length of the message digest produced is
+  controlled by `output-bit-length', which can take on the values 224,
+  256, 288, 384 and 512, which is the default value.
+
+Note that in order to generate a message digest of a string it will
+have to be converted to a simple-array with element-type
+(unsigned-byte 8) in the proper output-encoding.  This will have to
+rely on implementation-specific functions and is not part of the SHA3
+library.
+
+The implementation is licensed under the MIT-style license contained
+in the file COPYING and the header of each source file.
+
+Please direct any feedback to pmai@pmsf.de.  A git repository of this
+library is available under git://github.com/pmai/sha3.git
