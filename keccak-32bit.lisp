@@ -139,7 +139,7 @@
       (declare (fixnum y))
       (dotimes (x #.+keccak-state-columns+)
         (declare (fixnum x))
-        (let* ((element (+ (* y +keccak-state-columns+) x))
+        (let* ((element (+ (the fixnum (* y +keccak-state-columns+)) x))
                (part (* element +keccak-state-splits+))
                (offset (* element +keccak-1600-lane-byte-width+))
                (index (the fixnum (+ start offset))))

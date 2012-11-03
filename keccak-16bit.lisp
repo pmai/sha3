@@ -145,7 +145,7 @@
       (declare (fixnum y))
       (dotimes (x #.+keccak-state-columns+)
         (declare (fixnum x))
-        (let* ((element (+ (* y +keccak-state-columns+) x))
+        (let* ((element (+ (the fixnum (* y +keccak-state-columns+)) x))
                (part (* element +keccak-state-splits+))
                (offset (* element +keccak-1600-lane-byte-width+))
                (index (the fixnum (+ start offset))))
@@ -284,11 +284,6 @@
            #.*optimize-declaration*
            #+sbcl
            (sb-ext:muffle-conditions sb-ext:code-deletion-note))
-  #+(and xxx sbcl)
-  (if (or (zerop offset) (= offset 16))
-      value
-      (sb-rotate-byte:rotate-byte offset (byte 16 0) value))
-  #-(and xxx sbcl)
   (if (or (zerop offset) (= offset 16))
       value
       (logior (the keccak-1600-part (ash (ldb (byte (- 16 offset) 0) value) offset))

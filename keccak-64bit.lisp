@@ -77,7 +77,7 @@
     (declare (type (integer 0 200) rate-bytes))
     (dotimes (y +keccak-state-rows+)
       (dotimes (x +keccak-state-columns+)
-        (let* ((element (+ (* y +keccak-state-columns+) x))
+        (let* ((element (+ (the fixnum (* y +keccak-state-columns+)) x))
                (offset (* element +keccak-1600-lane-byte-width+))
                (index (the fixnum (+ start offset))))
           (when (>= offset rate-bytes)
