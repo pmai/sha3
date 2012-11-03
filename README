@@ -3,9 +3,9 @@ This library is an implementation of the Secure Hash Algorithm 3
 messages with an integral number of octets, i.e. sub-byte length
 messages are not supported.
 
-The implementation should be portable across nearly all ANSI compliant
-CL with specialized implementations tuned for implementations that
-offer unboxed 64bit arithmetic, unboxed 32bit arithmetic and for
+The code should be portable across nearly all ANSI compliant CL
+implementations with specialized versions tuned for implementations
+that offer unboxed 64bit arithmetic, unboxed 32bit arithmetic and for
 implementations with efficient fixnum arithmetic (requiring fixnums
 that can represent (unsigned-byte 16)).  Especially the 64 and 32bit
 implementations have been mostly optimized for SBCL and CMU CL.  For
