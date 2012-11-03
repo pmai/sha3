@@ -1,0 +1,5 @@
+Release 1.0.0
+=============
+
+ * Initial release with optimized versions for 64bit, 32bit and
+   fixnum arithmetic.
