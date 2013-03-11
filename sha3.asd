@@ -26,7 +26,7 @@
 ;;;; other dealings in this Software without prior written authorization
 ;;;; from the author.
 ;;;; 
-;;;; $Id$
+;;;; $Id: 2cbc5857639b13160ef580514a78749c02b70c0b $
 
 (cl:in-package #:cl-user)
 
@@ -50,9 +50,11 @@
                (:file "keccak-64bit" :depends-on ("pkgdef" "common"))
                #+(or (and :sbcl (not (or :x86-64 :alpha))) 
                      :cmucl
-                     (and :ccl :64-bit-target))
+                     (and :ccl :64-bit-target)
+                     (and :lispworks :lispworks-64bit))
                (:file "keccak-32bit" :depends-on ("pkgdef" "common"))
-               #-(or :sbcl :cmucl (and :ccl :64-bit-target))
+               #-(or :sbcl :cmucl (and :ccl :64-bit-target) 
+                     (and :lispworks :lispworks-64bit))
                (:file "keccak-16bit" :depends-on ("pkgdef" "common"))
                (:file "sha3" 
                       :depends-on ("pkgdef" 
@@ -61,7 +63,9 @@
                                    "keccak-64bit"
                                    #+(or (and :sbcl (not (or :x86-64 :alpha)))
                                          :cmucl
-                                         (and :ccl :64-bit-target))
+                                         (and :ccl :64-bit-target)
+                                         (and :lispworks :lispworks-64bit))
                                    "keccak-32bit"
-                                   #-(or :sbcl :cmucl (and :ccl :64-bit-target))
+                                   #-(or :sbcl :cmucl (and :ccl :64-bit-target)
+                                         (and :lispworks :lispworks-64bit))
                                    "keccak-16bit"))))
