@@ -1,3 +1,8 @@
+Release 1.0.1
+=============
+
+ * Change to 32bit implementation for 64bit LispWorks.
+
 Release 1.0.0
 =============
 
