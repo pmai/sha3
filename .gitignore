@@ -2,6 +2,7 @@
 *.fas
 *.fasl
 *.ofasl
+*.64ofasl
 *.nfasl
 *.xfasl
 *.dx32fsl
