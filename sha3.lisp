@@ -124,7 +124,7 @@ and `end', which must be numeric bounding-indices."
         (setf (sha3-state-buffer-index state) 0
               start (+ start remainder))))
     ;; Now handle full blocks, stuff any remainder into buffer
-    (loop for block-offset of-type fixnum from start to end by rate-bytes
+    (loop for block-offset of-type fixnum from start below end by rate-bytes
           do
        (cond
          ((<= (+ block-offset rate-bytes) end)
