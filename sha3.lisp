@@ -110,14 +110,19 @@ and `end', which must be numeric bounding-indices."
              #.*optimize-declaration*)
     ;; Handle potential remaining bytes
     (unless (zerop buffer-index)
-      (let ((remainder (- (length buffer) buffer-index)))
-        (declare (type fixnum remainder))
+      (let ((remainder (- (length buffer) buffer-index))
+            (length (- end start)))
+        (declare (type fixnum remainder length))
         (replace buffer vector :start1 buffer-index :start2 start :end2 end)
-        (when (>= (- end start) remainder)
-          (keccak-state-merge-input keccak-state bit-rate buffer 0)
-          (keccak-f keccak-state))
+        ;; Return if still unfilled buffer
+        (when (< length remainder)
+          (incf (sha3-state-buffer-index state) length)
+          (return-from sha3-update))
+        ;; Else handle now complete buffer
+        (keccak-state-merge-input keccak-state bit-rate buffer 0)
+        (keccak-f keccak-state)
         (setf (sha3-state-buffer-index state) 0
-              start (min (+ start remainder) end))))
+              start (+ start remainder))))
     ;; Now handle full blocks, stuff any remainder into buffer
     (loop for block-offset of-type fixnum from start to end by rate-bytes
           do
