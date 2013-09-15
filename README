@@ -3,6 +3,13 @@ This library is an implementation of the Secure Hash Algorithm 3
 messages with an integral number of octets, i.e. sub-byte length
 messages are not supported.
 
+NOTE that prior to release 1.0.2 this package had a bug in the
+generation of message digests where multiple calls to sha3-update
+with partial buffers could lead to input data being ignored and
+therefore erroneous message digests being generated.  Uses with
+only one call to sha3-update and the high-level routines were not
+affected by this bug.
+
 The code should be portable across nearly all ANSI compliant CL
 implementations with specialized versions tuned for implementations
 that offer unboxed 64bit arithmetic, unboxed 32bit arithmetic and for
