@@ -42,7 +42,7 @@
   :author "Pierre R. Mai <pmai@pmsf.de>"
   :maintainer "Pierre R. Mai <pmai@pmsf.de>"
   :licence "MIT/X11"
-  :version "1.0.0"
+  :version "1.0.2"
   #+sbcl :depends-on #+sbcl ("sb-rotate-byte")
   :components ((:file "pkgdef")
                (:file "common" :depends-on ("pkgdef"))
