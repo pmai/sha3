@@ -181,13 +181,17 @@ Only supports atoms and function forms, no special forms."
 ;;; Message Padding for last block
 ;;;
 
-(defun pad-message-to-width (message bit-width)
+(defun pad-message-to-width (message bit-width add-fips-202-suffix-p)
   "Destructively pad the given message to the given bit-width according to 
-Keccak padding rules and return the padded message."
+the Keccak 10*1 padding rules, optionally appending the FIPS 202/SHA-3
+mandated 01 suffix first, and return the padded message."
   (let ((message-byte-length (length message))
         (width-bytes (truncate bit-width 8)))
     (setq message (adjust-array message (list width-bytes)))
-    (setf (aref message message-byte-length) #x01)
+    ;; FIPS 202 SHA-3 mandates the appending of a 01 suffix prior to the
+    ;; final Keccak padding so that the first byte following the message
+    ;; will be #b00000101 instead of #b00000001 for raw Keccak.
+    (setf (aref message message-byte-length) (if add-fips-202-suffix-p #x06 #x01))
     (loop for index from (1+ message-byte-length) below width-bytes
           do (setf (aref message index) #x00)
           finally

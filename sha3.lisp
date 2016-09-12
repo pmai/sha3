@@ -134,10 +134,13 @@ and `end', which must be numeric bounding-indices."
           (replace buffer vector :start1 0 :start2 block-offset)
           (setf (sha3-state-buffer-index state) (- end block-offset)))))))
 
-(defun sha3-final (state &key (output-bit-length nil output-bit-length-p))
+(defun sha3-final (state &key (output-bit-length nil output-bit-length-p) raw-keccak-p)
   "If the given SHA-3 state `state' has not already been finalized,
 finalize it by processing any remaining input in its buffer, with
-suitable padding as specified by the SHA-3 standard.  Returns the
+the specified suffix of 01 and suitable padding as specified by the
+SHA-3 standard (the specified SHA-3 suffix can be elided with the
+optional keyword argument `raw-keccak-p' to generate digests as the
+initial Keccak submission would have generated).   Returns the
 message digest as a simple-array of (unsigned-byte 8).  The length
 of the returned digest is determined either by the output bit length
 or bit rate specified on state creation, or for the special case of
@@ -177,7 +180,8 @@ the function will return the digest again."
        (keccak-state-merge-input keccak-state bit-rate 
                                  (pad-message-to-width
                                   (subseq buffer 0 buffer-index)
-                                  bit-rate)
+                                  bit-rate
+                                  (not raw-keccak-p))
                                  0)
        (keccak-f keccak-state)
        (setf (sha3-state-buffer-index state) 0
@@ -189,12 +193,18 @@ the function will return the digest again."
 ;;;
 
 (defun sha3-digest-vector (vector &key (start 0) end 
-                           (output-bit-length 512))
+                           (output-bit-length 512)
+                           raw-keccak-p)
   "Calculate an SHA-3 message-digest of data in `vector', which should
 be a 1d simple-array with element type (unsigned-byte 8), bounded by
 `start' and `end'.  The bit length of the message digest produced is
 controlled by `output-bit-length', which can take on the values 224,
-256, 288, 384 and 512, which is the default value."
+256, 288, 384 and 512, which is the default value.  Using the optional
+`raw-keccak-p' keyword argument the SHA-3 mandated 01 suffix that is
+appended to the actual message prior to padding can be elided to yield
+message digests that match the original Keccak submission instead of
+the actual SHA-3 standard.  Use this option only for compatibility
+with historical implementations."
   (declare (optimize (speed 3) (safety 3) (space 0) (debug 1))
            (type (simple-array (unsigned-byte 8) (*)) vector)
            (type fixnum start)
@@ -207,7 +217,7 @@ controlled by `output-bit-length', which can take on the values 224,
       (let ((real-end (or end (length vector))))
         (declare (type fixnum real-end))
         (sha3-update state vector :start start :end real-end))
-      (sha3-final state))))
+      (sha3-final state :raw-keccak-p raw-keccak-p))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defconstant +buffer-size+ (* 128 1024)
@@ -216,12 +226,17 @@ controlled by `output-bit-length', which can take on the values 224,
 
 (deftype buffer-index () `(integer 0 ,+buffer-size+))
 
-(defun sha3-digest-stream (stream &key (output-bit-length 512))
+(defun sha3-digest-stream (stream &key (output-bit-length 512) raw-keccak-p)
   "Calculate an SHA-3 message-digest of data read from `stream', which
 should be a stream with element type (unsigned-byte 8).  The bit
 length of the message digest produced is controlled by
 `output-bit-length', which can take on the values 224, 256, 288, 384
-and 512, which is the default value."
+and 512, which is the default value.  Using the optional `raw-keccak-p'
+keyword argument the SHA-3 mandated 01 suffix that is appended to the
+actual message prior to padding can be elided to yield message digests
+that match the original Keccak submission instead of the actual SHA-3
+standard.  Use this option only for compatibility with historical
+implementations."
   (declare (optimize (speed 3) (safety 3) (space 0) (debug 1))
            (type stream stream)
            (type (integer 0 1600) output-bit-length))
@@ -238,16 +253,21 @@ and 512, which is the default value."
             do (sha3-update state buffer :end bytes)
             until (< bytes +buffer-size+)
             finally
-         (return (sha3-final state))))))
+         (return (sha3-final state :raw-keccak-p raw-keccak-p))))))
 
-(defun sha3-digest-file (pathname &key (output-bit-length 512))
+(defun sha3-digest-file (pathname &key (output-bit-length 512) raw-keccak-p)
   "Calculate an SHA-3 message-digest of the file specified by
 `pathname'.  The bit length of the message digest produced is
 controlled by `output-bit-length', which can take on the values 224,
-256, 288, 384 and 512, which is the default value."
+256, 288, 384 and 512, which is the default value.  Using the optional
+`raw-keccak-p' keyword argument the SHA-3 mandated 01 suffix that is
+appended to the actual message prior to padding can be elided to yield
+message digests that match the original Keccak submission instead of
+the actual SHA-3 standard.  Use this option only for compatibility
+with historical implementations."
   (declare (optimize (speed 3) (safety 3) (space 0) (debug 1))
            (type (integer 0 1600) output-bit-length))
   (locally
       (declare (optimize (safety 1) (debug 0)))
     (with-open-file (stream pathname :element-type '(unsigned-byte 8))
-      (sha3-digest-stream stream :output-bit-length output-bit-length))))
+      (sha3-digest-stream stream :output-bit-length output-bit-length :raw-keccak-p raw-keccak-p))))
