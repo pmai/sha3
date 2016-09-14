@@ -36,7 +36,8 @@
            #:test-with-testsuite
            #:read-testsuite-from-file
            #:test-with-testsuite-from-file
-           #:test-keccak-msgkat))
+           #:test-keccak-msgkat
+           #:test-sha3-msgkat))
 
 (cl:in-package #:keccak-reference)
 
@@ -369,6 +370,25 @@
           ("LongMsgKAT_256.txt" 1600 1088 256)
           ("LongMsgKAT_384.txt" 1600  832 384)
           ("LongMsgKAT_512.txt" 1600  576 512))
+        do
+     (unless
+         (test-with-testsuite-from-file
+          (merge-pathnames filename directory)
+          (if (null function)
+              (lambda (message) (keccak total-bits bit-rate output-bits message))
+              (lambda (message)
+                (funcall function total-bits bit-rate output-bits message))))
+       (setq result nil))
+        finally
+     (return result)))
+
+(defun test-sha3-msgkat (directory &optional function)
+  (loop with result = t
+        for (filename total-bits bit-rate output-bits) in
+        '(("ShortMsgKAT_SHA3-224.txt" 1600 1152 224)
+          ("ShortMsgKAT_SHA3-256.txt" 1600 1088 256)
+          ("ShortMsgKAT_SHA3-384.txt" 1600  832 384)
+          ("ShortMsgKAT_SHA3-512.txt" 1600  576 512))
         do
      (unless
          (test-with-testsuite-from-file

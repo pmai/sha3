@@ -136,6 +136,16 @@ form:
  "/Path/To/MsgKatDirectory"
  (lambda (total-bits bit-rate output-bits message)
    (declare (ignore total-bits bit-rate))
+   (sha3:sha3-digest-vector message :output-bit-length output-bits :raw-keccak-p t)))
+
+The adapted SHA-3 testcases from the Keccak Code Package test vectors
+available under https://github.com/gvanas/KeccakCodePackage/tree/master/TestVectors
+can be run with the following form:
+
+(keccak:test-sha3-msgkat 
+ "/Path/To/MsgKatDirectory"
+ (lambda (total-bits bit-rate output-bits message)
+   (declare (ignore total-bits bit-rate))
    (sha3:sha3-digest-vector message :output-bit-length output-bits)))
 
 This SHA-3 implementation is licensed under the MIT-style license
