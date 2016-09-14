@@ -1,3 +1,17 @@
+Release 1.1.0
+=============
+
+ * Change sha3 functions to match the final FIPS 202 SHA3 standard,
+   by appending a 01 suffix to messages prior to digest calculation.
+   The old Keccak submission behavior can be retained by passing in
+   the new raw-keccak-p keyword argument with true to the relevant
+   functions.  Thanks to David McClain for prompting this change.
+
+ * Fixes a bug in the bug fix of release 1.0.2 for the sha3-update
+   handling of not completely filled buffers reported by David McClain,
+   which could lead to out-of-bounds accesses in calls to the
+   pad-message-to-width function.
+
 Release 1.0.2
 =============
 

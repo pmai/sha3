@@ -10,6 +10,16 @@ therefore erroneous message digests being generated.  Uses with
 only one call to sha3-update and the high-level routines were not
 affected by this bug.
 
+NOTE that prior to release 1.1.0 this package computed digests
+based on the Keccak submission to the SHA-3 contest and did not
+yet take into account the added suffix that the FIPS 202 SHA-3
+final standard adds to messages prior to calculating the digest,
+since this was not part of the Keccak submission.  Starting with
+1.1.0 the functions in the sha3 package do by default calculate
+disgests that match the FIPS 202 standard, and will calculate
+the old pre-standard digests only if the new optional keyword
+argument :raw-keccak-p is passed with a true value.
+
 The code should be portable across nearly all ANSI compliant CL
 implementations with specialized versions tuned for implementations
 that offer unboxed 64bit arithmetic, unboxed 32bit arithmetic and for
@@ -51,11 +61,14 @@ The mid-level interfaces to the digest routines are the functions
   simple-array with element-type (unsigned-byte 8), bounded by `start'
   and `end', which must be numeric bounding-indices.
 
-- sha3:sha3-final state &key output-bit-length
+- sha3:sha3-final state &key output-bit-length raw-keccak-p
   
   If the given SHA-3 state `state' has not already been finalized,
   finalize it by processing any remaining input in its buffer, with
-  suitable padding as specified by the SHA-3 standard.  Returns the
+  the specified suffix of 01 and suitable padding as specified by the
+  SHA-3 standard (the specified SHA-3 suffix can be elided with the
+  optional keyword argument `raw-keccak-p' to generate digests as the
+  initial Keccak submission would have generated).  Returns the
   message digest as a simple-array of (unsigned-byte 8).  The length
   of the returned digest is determined either by the output bit length
   or bit rate specified on state creation, or for the special case of
@@ -67,28 +80,43 @@ For convenience the following high-level functions produce digests in
 one step from 1d simple-arrays and streams with element-type
 (unsigned-byte 8), as well as files:
 
-- sha3:sha3-digest-vector vector &key (start 0) end (output-bit-length 512)
+- sha3:sha3-digest-vector vector &key (start 0) end (output-bit-length 512) raw-keccak-p
   
   Calculate an SHA-3 message-digest of data in `vector', which should
   be a 1d simple-array with element type (unsigned-byte 8), bounded by
   `start' and `end'.  The bit length of the message digest produced is
   controlled by `output-bit-length', which can take on the values 224,
-  256, 288, 384 and 512, which is the default value.
+  256, 288, 384 and 512, which is the default value.  Using the optional
+  `raw-keccak-p' keyword argument the SHA-3 mandated 01 suffix that is
+  appended to the actual message prior to padding can be elided to yield
+  message digests that match the original Keccak submission instead of
+  the actual SHA-3 standard.  Use this option only for compatibility
+  with historical implementations.
 
-- sha3:sha3-digest-stream stream &key (output-bit-length 512)
+- sha3:sha3-digest-stream stream &key (output-bit-length 512) raw-keccak-p
   
   Calculate an SHA-3 message-digest of data read from `stream', which
   should be a stream with element type (unsigned-byte 8).  The bit
   length of the message digest produced is controlled by
   `output-bit-length', which can take on the values 224, 256, 288, 384
-  and 512, which is the default value.
+  and 512, which is the default value.  Using the optional `raw-keccak-p'
+  keyword argument the SHA-3 mandated 01 suffix that is appended to the
+  actual message prior to padding can be elided to yield message digests
+  that match the original Keccak submission instead of the actual SHA-3
+  standard.  Use this option only for compatibility with historical
+  implementations.  
 
-- sha3:sha3-digest-file pathname &key (output-bit-length 512)
+- sha3:sha3-digest-file pathname &key (output-bit-length 512) raw-keccak-p
   
   Calculate an SHA-3 message-digest of the file specified by
   `pathname'.  The bit length of the message digest produced is
   controlled by `output-bit-length', which can take on the values 224,
-  256, 288, 384 and 512, which is the default value.
+  256, 288, 384 and 512, which is the default value.  Using the optional
+  `raw-keccak-p' keyword argument the SHA-3 mandated 01 suffix that is
+  appended to the actual message prior to padding can be elided to yield
+  message digests that match the original Keccak submission instead of
+  the actual SHA-3 standard.  Use this option only for compatibility
+  with historical implementations.
 
 Note that in order to generate a message digest of a string it will
 have to be converted to a simple-array with element-type

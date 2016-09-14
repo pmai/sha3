@@ -1,6 +1,6 @@
 ;;;; SHA3 --- Secure Hash Algorithm 3 (Keccak) Implementation
 ;;;;
-;;;; Copyright (C) 2012 PMSF IT Consulting Pierre R. Mai.
+;;;; Copyright (C) 2012 -- 2016 PMSF IT Consulting Pierre R. Mai.
 ;;;;
 ;;;; Permission is hereby granted, free of charge, to any person obtaining
 ;;;; a copy of this software and associated documentation files (the
@@ -42,7 +42,7 @@
   :author "Pierre R. Mai <pmai@pmsf.de>"
   :maintainer "Pierre R. Mai <pmai@pmsf.de>"
   :licence "MIT/X11"
-  :version "1.0.2"
+  :version "1.1.0"
   #+sbcl :depends-on #+sbcl ("sb-rotate-byte")
   :components ((:file "pkgdef")
                (:file "common" :depends-on ("pkgdef"))
