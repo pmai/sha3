@@ -1,0 +1,27 @@
+language: lisp
+sudo: required
+
+env:
+  matrix:
+    - LISP=abcl
+    - LISP=allegro
+    - LISP=sbcl
+    - LISP=sbcl32
+    - LISP=ccl
+    - LISP=ccl32
+    - LISP=clisp
+    - LISP=clisp32
+    - LISP=ecl
+
+install:
+  - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
+  - git clone https://github.com/gvanas/KeccakCodePackage.git
+
+script:
+  - cl -e '(asdf:load-system "sha3")
+           (load (compile-file "keccak-reference.lisp"))
+           (unless (keccak:test-sha3-msgkat "KeccakCodePackage/TestVectors/"
+                     (lambda (total-bits bit-rate output-bits message)
+                       (declare (ignore total-bits bit-rate))
+                         (sha3:sha3-digest-vector message :output-bit-length output-bits)))
+             (uiop:quit 1))'
