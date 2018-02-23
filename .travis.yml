@@ -13,6 +13,10 @@ env:
     - LISP=clisp32
     - LISP=ecl
 
+matrix:
+  allow_failures:
+    - env: LISP=allegro
+
 install:
   - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
   - git clone https://github.com/gvanas/KeccakCodePackage.git
@@ -21,7 +25,7 @@ script:
   - cl -e '(asdf:load-system "sha3")
            (load (compile-file "keccak-reference.lisp"))
            (unless (keccak:test-sha3-msgkat "KeccakCodePackage/TestVectors/"
-                     (lambda (total-bits bit-rate output-bits message)
-                       (declare (ignore total-bits bit-rate))
-                         (sha3:sha3-digest-vector message :output-bit-length output-bits)))
+                     (lambda (cl-user::total-bits cl-user::bit-rate cl-user::output-bits cl-user::message)
+                       (declare (ignore cl-user::total-bits cl-user::bit-rate))
+                       (sha3:sha3-digest-vector cl-user::message :output-bit-length cl-user::output-bits)))
              (uiop:quit 1))'
