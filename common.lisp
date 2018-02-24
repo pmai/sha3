@@ -185,16 +185,18 @@ Only supports atoms and function forms, no special forms."
   "Destructively pad the given message to the given bit-width according to 
 the Keccak 10*1 padding rules, optionally appending the FIPS 202/SHA-3
 mandated 01 suffix first, and return the padded message."
-  (let ((message-byte-length (length message))
-        (width-bytes (truncate bit-width 8)))
-    (setq message (adjust-array message (list width-bytes)))
+  (let* ((message-byte-length (length message))
+         (width-bytes (truncate bit-width 8))
+         (padded (make-array width-bytes
+                             :element-type '(unsigned-byte 8))))
+    (replace padded message)
     ;; FIPS 202 SHA-3 mandates the appending of a 01 suffix prior to the
     ;; final Keccak padding so that the first byte following the message
     ;; will be #b00000101 instead of #b00000001 for raw Keccak.
-    (setf (aref message message-byte-length) (if add-fips-202-suffix-p #x06 #x01))
+    (setf (aref padded message-byte-length) (if add-fips-202-suffix-p #x06 #x01))
     (loop for index from (1+ message-byte-length) below width-bytes
-          do (setf (aref message index) #x00)
+          do (setf (aref padded index) #x00)
           finally
-       (setf (aref message (1- width-bytes))
-             (logior #x80 (aref message (1- width-bytes))))))
-  message)
+       (setf (aref padded (1- width-bytes))
+             (logior #x80 (aref padded (1- width-bytes)))))
+    padded))
