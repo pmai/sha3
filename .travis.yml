@@ -13,10 +13,6 @@ env:
     - LISP=clisp32
     - LISP=ecl
 
-matrix:
-  allow_failures:
-    - env: LISP=allegro
-
 install:
   - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
   - git clone https://github.com/gvanas/KeccakCodePackage.git

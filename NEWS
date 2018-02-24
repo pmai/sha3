@@ -1,3 +1,11 @@
+Release 1.1.1
+=============
+
+ * Fix a bug in pad-message-to-width on ACL, which would lead to
+   completely erroneous results being calculated for all inputs
+   due to differences in the result of adjust-array between ACL
+   and all other currently supported implementations.
+
 Release 1.1.0
 =============
 
