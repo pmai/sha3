@@ -1,3 +1,10 @@
+Release 1.1.2
+=============
+
+ * Switch to 16bit implementation for 64bit LispWorks 8, to avoid
+   compiler optimization problems in keccak-state-merge-input, and
+   also slightly higher performance due to non-consing.
+
 Release 1.1.1
 =============
 

@@ -42,7 +42,7 @@
   :author "Pierre R. Mai <pmai@pmsf.de>"
   :maintainer "Pierre R. Mai <pmai@pmsf.de>"
   :licence "MIT/X11"
-  :version "1.1.1"
+  :version "1.1.2"
   #+sbcl :depends-on #+sbcl ("sb-rotate-byte")
   :components ((:file "pkgdef")
                (:file "common" :depends-on ("pkgdef"))
@@ -51,10 +51,10 @@
                #+(or (and :sbcl (not (or :x86-64 :alpha))) 
                      :cmucl
                      (and :ccl :64-bit-target)
-                     (and :lispworks :lispworks-64bit))
+                     (and :lispworks :lispworks-64bit (not :lispworks8)))
                (:file "keccak-32bit" :depends-on ("pkgdef" "common"))
                #-(or :sbcl :cmucl (and :ccl :64-bit-target) 
-                     (and :lispworks :lispworks-64bit))
+                     (and :lispworks :lispworks-64bit (not :lispworks8)))
                (:file "keccak-16bit" :depends-on ("pkgdef" "common"))
                (:file "sha3" 
                       :depends-on ("pkgdef" 
@@ -64,8 +64,10 @@
                                    #+(or (and :sbcl (not (or :x86-64 :alpha)))
                                          :cmucl
                                          (and :ccl :64-bit-target)
-                                         (and :lispworks :lispworks-64bit))
+                                         (and :lispworks :lispworks-64bit
+					      (not :lispworks8)))
                                    "keccak-32bit"
                                    #-(or :sbcl :cmucl (and :ccl :64-bit-target)
-                                         (and :lispworks :lispworks-64bit))
+                                         (and :lispworks :lispworks-64bit
+					      (not :lispworks8)))
                                    "keccak-16bit"))))
